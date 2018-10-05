@@ -71,12 +71,18 @@ excluded_folders = []
 #The URL for your website (include slash after, eg: https://yoururl.com/)
 yoursite = "https://your_website.com/"
 
-# Get current directory
-cmdpipe = subprocess.Popen("pwd", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-raw_text = cmdpipe.stdout.readlines()
-# Remove the search folder name to get the webroot
-for text in raw_text:
-    webroot = text.replace("aaimi_site_search\n", "")   
+# The path to the web directory on your server
+# Leave blank if crawl_html_pages.py is in the aaimi_site_search folder in the webroot directory
+# To run crawl_html_pages.py from outside the webroot, add full path to webroot with trailing slash
+webroot = ""
+
+if webroot == "":
+    # Get current directory
+    cmdpipe = subprocess.Popen("pwd", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    raw_text = cmdpipe.stdout.readlines()
+    # Remove the search folder name to get the webroot
+    for text in raw_text:
+        webroot = text.replace("aaimi_site_search\n", "")   
 
 # If adding multiple web folders or sites to one search file change to yes to append to existing list
 existing_list = "no"
@@ -98,7 +104,8 @@ else:
 def get_site_pages():
     global page_count
     # Use LS to list folders and files recursively
-    comm = "cd .. && ls -R"
+    #comm = "cd .. && ls -R"
+    comm = "cd " + webroot + " && ls -R"
     cmdpipe = subprocess.Popen(comm, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     whole_list = cmdpipe.stdout.readlines()
     # Scrape each line of the LS results for HTML filenames, keeping track of currently focused directory.
